@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agapi | Piya & Bagas</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Background hearts -->
+  <div id="floating-hearts" class="floating-hearts"></div>
+
+  <!-- Notif lucu -->
+  <div id="notif-cute" class="notif-cute"></div>
+
+  <!-- Tombol scroll ke atas -->
+  <button id="scroll-top" class="scroll-top">↑</button>
+
+  <!-- Modal pesan rahasia -->
+  <div id="secret-modal" class="modal-overlay">
+    <div class="modal">
+      <h3>Pesan Rahasia Buat Piya</h3>
+      <p>
+        Terima kasih sudah tetap milih aku, tetap bertahan, dan tetap mau jalan bareng,
+        bahkan pas hari-harinya lagi nggak mulus.
+      </p>
+      <p>
+        Kalau suatu hari kamu buka web ini lagi, anggap ini pengingat kecil:
+        kamu itu berarti, lebih dari yang bisa aku tulis di sini.
+      </p>
+      <button id="close-modal" class="btn-primary btn-small">Tutup</button>
+    </div>
+  </div>
+
+  <header class="navbar">
+    <div class="logo">Agapi</div>
+    <nav class="nav-links">
+      <a href="#beranda">Beranda</a>
+      <a href="#momen">Momen</a>
+      <a href="#wishlist">Wishlist</a>
+      <a href="#kenapa">Kenapa Kamu?</a>
+      <a href="#mood">Mood</a>
+      <a href="#kontak">Kontak</a>
+      <button id="toggle-theme" type="button" class="icon-button">🌙</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- BERANDA -->
+    <section id="beranda" class="hero">
+      <div class="hero-text">
+        <p class="mini-label">Piya ✧ Bagas</p>
+        <h1>Website ini berisi tentang Kamu dan Aku</h1>
+        <p>
+          Tempat nyimpen cerita kecil kita, dari pertama jadian sampai rencana-rencana
+          yang pengin diwujudin bareng.
+        </p>
+
+        <a href="#momen" class="btn-primary">Lihat momen-momen spesial</a>
+
+        <div class="stats-row">
+          <div class="stat-item">
+            <span class="stat-label">Hari sejak pertama jadian (8 Juni 2025)</span>
+            <span class="stat-value"><span id="hari-bersama">0</span> hari</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Mode tampilan</span>
+            <span class="stat-value" id="theme-status">Light</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Total wishlist tersimpan</span>
+            <span class="stat-value" id="wishlist-count">0 hal</span>
+          </div>
+        </div>
+
+        <div class="quote-box">
+          <p id="random-quote">"...loading quotes..."</p>
+        </div>
+
+        <button id="open-modal" class="btn-link">
+          Buka pesan rahasia buat kamu
+        </button>
+      </div>
+    </section>
+
+    <!-- MOMEN-MOMEN SPESIAL -->
+    <section id="momen" class="section">
+      <h2>Momen-Momen Spesial</h2>
+      <p>
+        Beberapa momen yang kalau diinget bikin senyum sendiri. Nanti bisa kamu tambahin lagi
+        kapan pun kalau ada momen baru.
+      </p>
+
+      <div class="card-grid">
+        <article class="card">
+          <h3>Ramadhan — Pertama kali kenal</h3>
+          <p class="card-meta">Momen awal | dikenalin teman</p>
+          <p>
+            Chat masih kaku banget. Tapi dari situ pelan-pelan mulai kebiasa cerita
+            hal-hal receh sampai yang lumayan serius.
+          </p>
+        </article>
+
+        <article class="card">
+          <h3>First Call yang Kepanjangan</h3>
+          <p class="card-meta">Tiba-tiba udah tengah malam</p>
+          <p>
+            Rencana cuma call untuk main roblox, tapi ujung-ujungnya ngobrol ke mana-mana.
+            Dari hal penting sampai bahas hal-hal nggak jelas tapi bikin nyaman.
+          </p>
+        </article>
+
+        <article class="card">
+          <h3>Dari Cool ke Manja</h3>
+          <p class="card-meta">Perubahan patch Piya</p>
+          <p>
+            Dulu Piya sok cool dan logis. Sekarang masih logis sih, tapi pelan-pelan
+            patch-nya update jadi lebih manja, lebih sering ngasih kode,
+            dan lebih transparan soal perasaan.
+          </p>
+        </article>
+
+        <article class="card">
+          <h3>Inside Joke Kita</h3>
+          <p class="card-meta">Cuma kita yang paham</p>
+          <p>
+            Ada beberapa kata, emoji, dan gaya chat yang kalau orang lain lihat biasa aja,
+            tapi buat kita punya cerita sendiri di baliknya.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- WISHLIST & ALASAN SAYANG -->
+    <section id="wishlist" class="section">
+      <h2>Wishlist & Alasan Sayang</h2>
+      <p>
+        Ini daftar hal-hal yang pengin kita lakuin bareng. Kalau kamu atau aku nambah di sini,
+        device lain bakal ngikut karena datanya disimpan di Firebase.
+      </p>
+
+      <div class="card-grid">
+        <article class="card">
+          <h3>Wishlist Date / Hal Bareng</h3>
+          <p>
+            Tambah ide kegiatan bareng di sini. Setiap item akan dicatat siapa yang nambah.
+          </p>
+
+          <div class="wishlist-form">
+            <input type="text" id="wishlist-input" placeholder="Contoh: jalan sore, nonton film...">
+            <input type="text" id="wishlist-name" placeholder="Nama yang nambah (contoh: Bagas / Piya)">
+            <button id="wishlist-add" class="btn-primary btn-small">Tambah</button>
+          </div>
+
+          <ul id="wishlist-list" class="wishlist-list"></ul>
+        </article>
+
+        <article class="card">
+          <h3>Random alasan sayang</h3>
+          <p id="alasan-teks">
+            Klik tombol di bawah buat munculin alasan random kenapa aku sayang kamu.
+          </p>
+          <button type="button" class="btn-primary btn-small" id="btn-alasan">
+            Tampilkan alasan random
+          </button>
+        </article>
+      </div>
+    </section>
+
+    <!-- KENAPA KAMU / FAQ + PROGRESS -->
+    <section id="kenapa" class="section">
+      <h2>Kenapa Harus Kamu?</h2>
+      <p>
+        Bagian ini khusus buat jelasin, bahkan ke diri sendiri, kenapa aku milih kamu dan terus mau bareng kamu.
+      </p>
+
+      <div class="card-grid">
+        <article class="card">
+          <h3>Alasan utama</h3>
+          <p>
+            Karena sama kamu itu terasa ringan. Bisa cerita apa aja, bisa jujur,
+            dan nggak perlu pura-pura jadi orang lain. Sesimpel itu, tapi seserius itu.
+          </p>
+        </article>
+
+        <article class="card">
+          <h3>Progress perjalanan bareng</h3>
+          <p class="card-meta">Versi bercanda, tapi niat</p>
+          <p>
+            Baris di bawah ini cuma visual doang, tapi intinya: setiap hari nambah, setiap hari belajar sesuatu.
+          </p>
+          <div class="relationship-progress">
+            <span class="progress-label">Sejauh ini kita udah jalan sejauh:</span>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <p class="progress-note" id="progress-note"></p>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Pertanyaan yang sering muncul di kepala</h3>
+
+          <div class="faq">
+            <div class="faq-item">
+              <button class="faq-question">“kalau semisal belum ada waktu yg pas buat kita meet, kmu bakal bosen terus nyari pengganti yg 1 daerah sama kamu ga?”</button>
+              <div class="faq-answer">
+                Engga dong, aku bakal selalu nunggu kamu kapanpun itu, dan aku juga gada tenaga lagi buat cari yang baru.
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question">“setelah menjalin hubungan sama aku kamu ada rasa nyesel ga?”</button>
+              <div class="faq-answer">
+                Yaa pasti engga dong, emang apa alasan aku nyesel? yang ada aku seneng dapet yang bener2 sesuai kriteria aku hehe, mines ldr doang sih.
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question">“Apa kamu nyesel udah milih aku?”</button>
+              <div class="faq-answer">
+                Nggak. Ada capek, ada berantem, iya. Tapi kalau soal rasa, sejauh ini masih bersyukur.
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- MOOD SECTION -->
+    <section id="mood" class="section">
+      <h2>Mood Kamu Hari Ini</h2>
+      <p>
+        Pilih mood kamu hari ini. Di bawahnya bakal muncul respon yang beda-beda.
+      </p>
+
+      <div class="card-grid">
+        <article class="card">
+          <h3>Pilih mood</h3>
+          <select id="mood-select" class="mood-select">
+            <option value="">Pilih mood...</option>
+            <option value="happy">Happy</option>
+            <option value="tired">Capek</option>
+            <option value="overthinking">Overthinking</option>
+            <option value="grateful">Bersyukur</option>
+          </select>
+          <div id="mood-result" class="mood-result">
+            Belum pilih mood, tapi semoga harimu baik-baik saja.
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Pesan pendek buat hari ini</h3>
+          <p id="pesan-harian">
+            Klik tombol di bawah kalau mau dapet satu kalimat pendek buat nemenin hari ini.
+          </p>
+          <button id="btn-pesan-harian" class="btn-primary btn-small">
+            Tampilkan pesan hari ini
+          </button>
+        </article>
+      </div>
+    </section>
+
+    <!-- KONTAK -->
+    <section id="kontak" class="section">
+      <h2>Kontak</h2>
+      <p>
+        Kalau lagi jauh atau lagi males ngomong langsung, boleh kirim pesan lewat form ini (simulasi aja).
+      </p>
+
+      <p><strong>Kontak simbolis:</strong> 09076354534665</p>
+
+      <form id="contact-form" class="contact-form">
+        <label for="nama">Nama</label>
+        <input type="text" id="nama" placeholder="Tulis nama kamu">
+
+        <label for="pesan">Pesan</label>
+        <textarea id="pesan" rows="4" placeholder="Tulis pesan singkat"></textarea>
+
+        <button type="submit" class="btn-primary">Kirim</button>
+        <p id="status-pesan" class="status-pesan"></p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>© 2025 Bagas. Dibuat dengan HTML, CSS, JavaScript, dan sedikit rasa.</p>
+  </footer>
+
+  <!-- Firebase v8 (CDN) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <!-- Script utama -->
+  <script src="script.js"></script>
+</body>
+</html>
