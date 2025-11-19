@@ -367,4 +367,185 @@ if (wishlistAdd && wishlistInput && wishlistName) {
       wishlistAdd.click();
     }
   };
+  /* ============================
+   LDR CLOCK WIB → WITA
+============================ */
+function updateTime() {
+  const now = new Date();
+
+  // Waktu Bagas → WIB (default device kamu)
+  document.getElementById("time-bagas").textContent =
+    now.toLocaleTimeString("id-ID");
+
+  // Waktu Piya → WITA (WIB + 1 jam)
+  const piyaTime = new Date(now.getTime() - 1 * 60 * 60 * 1000);
+
+  document.getElementById("time-piya").textContent =
+    piyaTime.toLocaleTimeString("id-ID");
+}
+
+setInterval(updateTime, 1000);
+
+
+/* ============================
+   COUNTDOWN NEXT MEET
+============================ */
+const nextDateInput = document.getElementById("next-date");
+const countdownText = document.getElementById("countdown");
+const saveNextDate = document.getElementById("save-nextdate");
+
+saveNextDate.onclick = () => {
+  const date = nextDateInput.value;
+  if (!date) return;
+  localStorage.setItem("nextMeet", date);
+  updateCountdown();
+};
+
+function updateCountdown() {
+  const date = localStorage.getItem("nextMeet");
+  if (!date) return;
+
+  const eventDate = new Date(date);
+  const now = new Date();
+  const diff = eventDate - now;
+
+  if (diff <= 0) {
+    countdownText.textContent = "Hari ini ketemu! ❤️";
+    return;
+  }
+
+  const days = Math.floor(diff / (1000*60*60*24));
+  countdownText.textContent = `Tersisa ${days} hari lagi sampai ketemu.`;
+}
+setInterval(updateCountdown, 1000);
+
+/* ============================
+   DISTANCE
+============================ */
+const distanceInput = document.getElementById("distance-input");
+const saveDistance = document.getElementById("save-distance");
+const distanceResult = document.getElementById("distance-result");
+
+saveDistance.onclick = () => {
+  const km = distanceInput.value;
+  if (!km) return;
+  localStorage.setItem("ldrDistance", km);
+  distanceResult.textContent = `${km} km jauhnya.`;
+};
+
+const lastDist = localStorage.getItem("ldrDistance");
+if (lastDist) distanceResult.textContent = `${lastDist} km jauhnya.`;
+
+
+/* ============================
+   STATUS ONLINE
+============================ */
+const ldrStatus = document.getElementById("ldr-status");
+
+setInterval(() => {
+  ldrStatus.textContent =
+    Math.random() < 0.5 ? "Online 💚" : "Offline 💤";
+}, 8000);
+
+/* ============================
+   STRENGTH BAR
+============================ */
+const strength = document.getElementById("ldr-strength");
+const strengthLabel = document.getElementById("ldr-strength-label");
+
+let power = Math.floor(Math.random()*40) + 60; // random 60–100%
+
+strength.style.width = power + "%";
+strengthLabel.textContent = `Kekuatan hubungan LDR kita: ${power}% solid`;
+
+/* ============================
+   DIARY (FIREBASE)
+============================ */
+const diaryRef = firebase.database().ref("diary");
+
+const diaryInput = document.getElementById("diary-text");
+const diaryName = document.getElementById("diary-name");
+const diaryAdd = document.getElementById("diary-add");
+const diaryList = document.getElementById("diary-list");
+
+diaryAdd.onclick = () => {
+  const text = diaryInput.value.trim();
+  const name = diaryName.value.trim() || "Anon";
+
+  if (!text) return;
+
+  diaryRef.push({
+    text, 
+    name,
+    time: Date.now()
+  });
+
+  diaryInput.value = "";
+};
+
+diaryRef.on("value", (snap) => {
+  diaryList.innerHTML = "";
+  const data = snap.val();
+  if (!data) return;
+
+  const entries = Object.entries(data)
+    .sort((a,b)=> a[1].time - b[1].time);
+
+  for (const [id,item] of entries) {
+    const li = document.createElement("li");
+
+    li.innerHTML = `
+      <div class="wishlist-text">
+        <span>${item.text}</span>
+        <span class="wishlist-by">Ditulis oleh: ${item.name}</span>
+      </div>
+    `;
+    diaryList.appendChild(li);
+  }
+});
+
+/* ============================
+   FOOD MODAL
+============================ */
+const foodCards = document.querySelectorAll(".food-card");
+const foodModal = document.getElementById("food-modal");
+const foodTitle = document.getElementById("food-title");
+const foodImage = document.getElementById("food-image");
+const foodDesc = document.getElementById("food-desc");
+const foodStory = document.getElementById("food-story");
+const foodClose = document.getElementById("food-close");
+
+const foodData = {
+  mieayam: {
+    title: "Mie Ayam",
+    img: "https://i.imgur.com/E0qJtB2.jpeg",
+    desc: "Comfort food paling aman buat segala cuaca.",
+    story: "Ini makanan favorit dia. Dari pertama kali kenal sampai sekarang, pilihan aman yang nggak pernah gagal bikin mood naik."
+  },
+  bakso: {
+    title: "Bakso",
+    img: "https://i.imgur.com/D3WA3eM.jpeg",
+    desc: "Makanan serbaguna, cocok kapan pun.",
+    story: "Kalau lagi bingung makan apa, bakso selalu jadi jawaban. Apalagi pas lagi LDR, ini makanan yang paling sering kepikiran."
+  }
+};
+
+foodCards.forEach(card=>{
+  card.onclick = () =>{
+    const key = card.dataset.food;
+    const d = foodData[key];
+
+    foodTitle.textContent = d.title;
+    foodImage.src = d.img;
+    foodDesc.textContent = d.desc;
+    foodStory.textContent = d.story;
+
+    foodModal.style.display = "flex";
+  };
+});
+
+foodClose.onclick = ()=> foodModal.style.display = "none";
+foodModal.onclick = (e)=> { 
+  if(e.target === foodModal) foodModal.style.display="none";
+};
 }
