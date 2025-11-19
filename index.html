@@ -281,6 +281,129 @@
         <p id="status-pesan" class="status-pesan"></p>
       </form>
     </section>
+    <!-- SECTION LDR -->
+<section id="ldr" class="section">
+  <h2>Hubungan LDR Kita</h2>
+  <p>
+    Walaupun LDR itu nggak gampang, tapi sejauh ini kita bisa terus jalan bareng.
+    Semua ini buat jadi pengingat: kita tetap satu tim.
+  </p>
+
+  <div class="card-grid">
+
+    <!-- Waktu -->
+    <article class="card">
+      <h3>Waktu Kita Sekarang</h3>
+      <p class="card-meta">Real-time clock</p>
+      <div class="ldr-clock-box">
+        <div>
+          <strong>Waktu Bagas:</strong>
+          <p id="time-bagas">00:00:00</p>
+        </div>
+        <div>
+          <strong>Waktu Piya:</strong>
+          <p id="time-piya">00:00:00</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- Countdown ketemu -->
+    <article class="card">
+      <h3>Countdown Ketemu Berikutnya</h3>
+      <p class="card-meta">Tanggal ketemu selanjutnya</p>
+
+      <input type="date" id="next-date" class="ldr-input">
+      <button id="save-nextdate" class="btn-small btn-primary">Simpan</button>
+
+      <p class="ldr-countdown" id="countdown">
+        Belum ditentukan, isi tanggal dulu ya
+      </p>
+    </article>
+
+    <!-- Jarak -->
+    <article class="card">
+      <h3>Jarak Kita</h3>
+      <p class="card-meta">Dalam kilometer</p>
+
+      <input type="number" id="distance-input" placeholder="Contoh: 128 km" class="ldr-input">
+      <button id="save-distance" class="btn-small btn-primary">Simpan</button>
+
+      <p class="ldr-distance" id="distance-result">
+        Belum ada data jarak.
+      </p>
+    </article>
+
+
+    <!-- Status Online -->
+    <article class="card">
+      <h3>Status Kita Sekarang</h3>
+      <p class="card-meta">Simulasi</p>
+      <p id="ldr-status" class="ldr-status">Checking...</p>
+    </article>
+
+    <!-- Strength Bar -->
+    <article class="card">
+      <h3>Kekuatan Hubungan LDR Kita</h3>
+      <p class="card-meta">Just for fun</p>
+
+      <div class="progress-bar">
+        <div class="progress-fill" id="ldr-strength"></div>
+      </div>
+      <p id="ldr-strength-label" class="progress-note"></p>
+    </article>
+
+    <!-- Diary LDR -->
+    <article class="card">
+      <h3>Diary LDR Kita</h3>
+      <p class="card-meta">Sinkron Firebase</p>
+
+      <div class="wishlist-form">
+        <input type="text" id="diary-text" placeholder="Tulis hal kecil hari ini...">
+        <input type="text" id="diary-name" placeholder="Nama (Bagas/Piya)">
+        <button id="diary-add" class="btn-primary btn-small">Tambah</button>
+      </div>
+
+      <ul id="diary-list" class="wishlist-list"></ul>
+    </article>
+  </div>
+</section>
+
+<!-- SECTION MAKANAN FAVORIT -->
+<section id="makanan" class="section">
+  <h2>Makanan Favorit Kamu</h2>
+  <p>Mie Ayam & Bakso—dua makanan fav kamu.</p>
+
+  <div class="food-grid">
+
+    <article class="food-card" data-food="mieayam">
+      <img src="https://i.imgur.com/E0qJtB2.jpeg" class="food-img">
+      <div class="food-info">
+        <h3>Mie Ayam</h3>
+        <div class="food-rating">★★★★★</div>
+      </div>
+    </article>
+
+    <article class="food-card" data-food="bakso">
+      <img src="https://i.imgur.com/D3WA3eM.jpeg" class="food-img">
+      <div class="food-info">
+        <h3>Bakso</h3>
+        <div class="food-rating">★★★★★</div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- MODAL MAKANAN -->
+<div id="food-modal" class="modal-overlay">
+  <div class="modal food-modal-box">
+    <h3 id="food-title"></h3>
+    <img id="food-image" class="food-modal-img">
+    <p id="food-desc"></p>
+    <p id="food-story"></p>
+    <button id="food-close" class="btn-primary btn-small">Tutup</button>
+  </div>
+</div>
   </main>
 
   <footer class="footer">
