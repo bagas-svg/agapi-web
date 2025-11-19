@@ -15,7 +15,10 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
-const wishlistRef = firebase.database().ref("wishlist");
+const db = firebase.database();
+const wishlistRef = db.ref("wishlist");
+const diaryRef = db.ref("diary");
+const contactRef = db.ref("contact-messages");
 
 /* =====================
    THEME MODE
@@ -68,13 +71,14 @@ if (hariBersamaEl) {
 }
 
 /* =====================
-   FORM KONTAK SIMULASI
+   CONTACT INBOX (FIREBASE)
    ===================== */
 
 const contactForm = document.getElementById("contact-form");
 const statusPesan = document.getElementById("status-pesan");
+const contactList = document.getElementById("contact-list");
 
-if (contactForm) {
+if (contactForm && statusPesan) {
   contactForm.addEventListener("submit", (event) => {
     event.preventDefault();
 
@@ -86,10 +90,42 @@ if (contactForm) {
       return;
     }
 
-    statusPesan.textContent =
-      `Makasih, ${nama}! Pesan kamu: "${pesan}" sudah masuk (simulasi).`;
+    contactRef
+      .push({
+        nama: nama,
+        pesan: pesan,
+        time: Date.now()
+      })
+      .then(() => {
+        statusPesan.textContent = "Pesan terkirim! 💙";
+        contactForm.reset();
+      })
+      .catch(() => {
+        statusPesan.textContent = "Gagal nyimpen pesan, coba lagi ya :(";
+      });
+  });
+}
 
-    contactForm.reset();
+if (contactList) {
+  contactRef.on("value", (snapshot) => {
+    contactList.innerHTML = "";
+    const data = snapshot.val();
+    if (!data) return;
+
+    const items = Object.entries(data).sort(
+      (a, b) => (a[1].time || 0) - (b[1].time || 0)
+    );
+
+    for (const [, item] of items) {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <div class="wishlist-text">
+          <span>"${item.pesan}"</span>
+          <span class="wishlist-by">Dari: ${item.nama}</span>
+        </div>
+      `;
+      contactList.appendChild(li);
+    }
   });
 }
 
@@ -144,7 +180,7 @@ setInterval(() => {
   h.classList.add("heart");
   h.textContent = "❤";
   h.style.left = Math.random() * 100 + "%";
-  h.style.fontSize = (14 + Math.random() * 10) + "px";
+  h.style.fontSize = 14 + Math.random() * 10 + "px";
 
   hearts.appendChild(h);
   setTimeout(() => h.remove(), 4000);
@@ -197,8 +233,8 @@ const openModal = document.getElementById("open-modal");
 const closeModal = document.getElementById("close-modal");
 
 if (modal && openModal && closeModal) {
-  openModal.onclick = () => modal.style.display = "flex";
-  closeModal.onclick = () => modal.style.display = "none";
+  openModal.onclick = () => (modal.style.display = "flex");
+  closeModal.onclick = () => (modal.style.display = "none");
 
   modal.onclick = (e) => {
     if (e.target === modal) modal.style.display = "none";
@@ -229,7 +265,7 @@ const progressNote = document.getElementById("progress-note");
 
 if (progressFill && progressNote && hariBersamaEl) {
   const days = parseInt(hariBersamaEl.textContent || "0", 10);
-  const capped = Math.min(days, 365);     // anggap 365 hari = 100%
+  const capped = Math.min(days, 365);
   const percent = Math.round((capped / 365) * 100);
 
   setTimeout(() => {
@@ -252,13 +288,16 @@ if (moodSelect && moodResult) {
     let text = "Belum pilih mood, tapi semoga harimu baik-baik saja.";
 
     if (mood === "happy") {
-      text = "Seneng liat kamu happy. Semoga perasaan itu nggak cuma numpang lewat.";
+      text =
+        "Seneng liat kamu happy. Semoga perasaan itu nggak cuma numpang lewat.";
     } else if (mood === "tired") {
       text = "Kalau capek, istirahat sebentar nggak apa-apa. Aku tetap di sini.";
     } else if (mood === "overthinking") {
-      text = "Overthinking boleh sebentar, tapi jangan tinggal di sana lama-lama. Kamu nggak sendirian.";
+      text =
+        "Overthinking boleh sebentar, tapi jangan tinggal di sana lama-lama. Kamu nggak sendirian.";
     } else if (mood === "grateful") {
-      text = "Kalau kamu lagi bersyukur, aku juga ikut bersyukur karena masih bisa sama kamu.";
+      text =
+        "Kalau kamu lagi bersyukur, aku juga ikut bersyukur karena masih bisa sama kamu.";
     }
 
     moodResult.textContent = text;
@@ -308,8 +347,9 @@ function renderWishlist(snapshot) {
     return;
   }
 
-  const items = Object.entries(data)
-    .sort((a, b) => (a[1].createdAt || 0) - (b[1].createdAt || 0));
+  const items = Object.entries(data).sort(
+    (a, b) => (a[1].createdAt || 0) - (b[1].createdAt || 0)
+  );
 
   if (wishlistCount) wishlistCount.textContent = items.length + " hal";
 
@@ -341,7 +381,7 @@ function renderWishlist(snapshot) {
   }
 }
 
-if (wishlistRef && wishlistList) {
+if (wishlistList) {
   wishlistRef.on("value", renderWishlist);
 }
 
@@ -367,146 +407,170 @@ if (wishlistAdd && wishlistInput && wishlistName) {
       wishlistAdd.click();
     }
   };
-  /* ============================
-   LDR CLOCK WIB → WITA
-============================ */
+}
+
+/* ============================
+   LDR CLOCK (KAMU WITA, DIA WIB)
+   ============================ */
+
 function updateTime() {
   const now = new Date();
 
-  // Waktu Bagas → WIB (default device kamu)
-  document.getElementById("time-bagas").textContent =
-    now.toLocaleTimeString("id-ID");
+  const elBagas = document.getElementById("time-bagas");
+  if (elBagas) {
+    elBagas.textContent = now.toLocaleTimeString("id-ID");
+  }
 
-  // Waktu Piya → WITA (WIB + 1 jam)
   const piyaTime = new Date(now.getTime() - 1 * 60 * 60 * 1000);
-
-  document.getElementById("time-piya").textContent =
-    piyaTime.toLocaleTimeString("id-ID");
+  const elPiya = document.getElementById("time-piya");
+  if (elPiya) {
+    elPiya.textContent = piyaTime.toLocaleTimeString("id-ID");
+  }
 }
 
 setInterval(updateTime, 1000);
-
+updateTime();
 
 /* ============================
    COUNTDOWN NEXT MEET
-============================ */
+   ============================ */
+
 const nextDateInput = document.getElementById("next-date");
 const countdownText = document.getElementById("countdown");
 const saveNextDate = document.getElementById("save-nextdate");
 
-saveNextDate.onclick = () => {
-  const date = nextDateInput.value;
-  if (!date) return;
-  localStorage.setItem("nextMeet", date);
-  updateCountdown();
-};
+if (nextDateInput && countdownText && saveNextDate) {
+  saveNextDate.onclick = () => {
+    const date = nextDateInput.value;
+    if (!date) return;
+    localStorage.setItem("nextMeet", date);
+    updateCountdown();
+  };
 
-function updateCountdown() {
-  const date = localStorage.getItem("nextMeet");
-  if (!date) return;
+  function updateCountdown() {
+    const date = localStorage.getItem("nextMeet");
+    if (!date) {
+      countdownText.textContent = "Belum ditentukan, isi tanggal dulu ya.";
+      return;
+    }
 
-  const eventDate = new Date(date);
-  const now = new Date();
-  const diff = eventDate - now;
+    const eventDate = new Date(date);
+    const now = new Date();
+    const diff = eventDate - now;
 
-  if (diff <= 0) {
-    countdownText.textContent = "Hari ini ketemu! ❤️";
-    return;
+    if (diff <= 0) {
+      countdownText.textContent = "Hari ini ketemu! ❤️";
+      return;
+    }
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    countdownText.textContent = `Tersisa ${days} hari lagi sampai ketemu.`;
   }
 
-  const days = Math.floor(diff / (1000*60*60*24));
-  countdownText.textContent = `Tersisa ${days} hari lagi sampai ketemu.`;
+  updateCountdown();
+  setInterval(updateCountdown, 60000);
 }
-setInterval(updateCountdown, 1000);
 
 /* ============================
    DISTANCE
-============================ */
+   ============================ */
+
 const distanceInput = document.getElementById("distance-input");
 const saveDistance = document.getElementById("save-distance");
 const distanceResult = document.getElementById("distance-result");
 
-saveDistance.onclick = () => {
-  const km = distanceInput.value;
-  if (!km) return;
-  localStorage.setItem("ldrDistance", km);
-  distanceResult.textContent = `${km} km jauhnya.`;
-};
+if (distanceInput && saveDistance && distanceResult) {
+  saveDistance.onclick = () => {
+    const km = distanceInput.value;
+    if (!km) return;
+    localStorage.setItem("ldrDistance", km);
+    distanceResult.textContent = `${km} km jauhnya.`;
+  };
 
-const lastDist = localStorage.getItem("ldrDistance");
-if (lastDist) distanceResult.textContent = `${lastDist} km jauhnya.`;
-
+  const lastDist = localStorage.getItem("ldrDistance");
+  if (lastDist) distanceResult.textContent = `${lastDist} km jauhnya.`;
+}
 
 /* ============================
    STATUS ONLINE
-============================ */
+   ============================ */
+
 const ldrStatus = document.getElementById("ldr-status");
 
-setInterval(() => {
-  ldrStatus.textContent =
-    Math.random() < 0.5 ? "Online 💚" : "Offline 💤";
-}, 8000);
+if (ldrStatus) {
+  const updateStatus = () => {
+    ldrStatus.textContent =
+      Math.random() < 0.5 ? "Online 💚" : "Offline 💤";
+  };
+  updateStatus();
+  setInterval(updateStatus, 8000);
+}
 
 /* ============================
    STRENGTH BAR
-============================ */
+   ============================ */
+
 const strength = document.getElementById("ldr-strength");
 const strengthLabel = document.getElementById("ldr-strength-label");
 
-let power = Math.floor(Math.random()*40) + 60; // random 60–100%
-
-strength.style.width = power + "%";
-strengthLabel.textContent = `Kekuatan hubungan LDR kita: ${power}% solid`;
+if (strength && strengthLabel && hariBersamaEl) {
+  const days = parseInt(hariBersamaEl.textContent || "0", 10);
+  const power = Math.min(100, 50 + Math.floor(days / 5));
+  strength.style.width = power + "%";
+  strengthLabel.textContent = `Kekuatan hubungan LDR kita: ${power}% solid`;
+}
 
 /* ============================
    DIARY (FIREBASE)
-============================ */
-const diaryRef = firebase.database().ref("diary");
+   ============================ */
 
 const diaryInput = document.getElementById("diary-text");
 const diaryName = document.getElementById("diary-name");
 const diaryAdd = document.getElementById("diary-add");
 const diaryList = document.getElementById("diary-list");
 
-diaryAdd.onclick = () => {
-  const text = diaryInput.value.trim();
-  const name = diaryName.value.trim() || "Anon";
+if (diaryInput && diaryName && diaryAdd && diaryList) {
+  diaryAdd.onclick = () => {
+    const text = diaryInput.value.trim();
+    const name = diaryName.value.trim() || "Anon";
 
-  if (!text) return;
+    if (!text) return;
 
-  diaryRef.push({
-    text, 
-    name,
-    time: Date.now()
+    diaryRef.push({
+      text,
+      name,
+      time: Date.now()
+    });
+
+    diaryInput.value = "";
+  };
+
+  diaryRef.on("value", (snap) => {
+    diaryList.innerHTML = "";
+    const data = snap.val();
+    if (!data) return;
+
+    const entries = Object.entries(data).sort(
+      (a, b) => (a[1].time || 0) - (b[1].time || 0)
+    );
+
+    for (const [, item] of entries) {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <div class="wishlist-text">
+          <span>${item.text}</span>
+          <span class="wishlist-by">Ditulis oleh: ${item.name}</span>
+        </div>
+      `;
+      diaryList.appendChild(li);
+    }
   });
-
-  diaryInput.value = "";
-};
-
-diaryRef.on("value", (snap) => {
-  diaryList.innerHTML = "";
-  const data = snap.val();
-  if (!data) return;
-
-  const entries = Object.entries(data)
-    .sort((a,b)=> a[1].time - b[1].time);
-
-  for (const [id,item] of entries) {
-    const li = document.createElement("li");
-
-    li.innerHTML = `
-      <div class="wishlist-text">
-        <span>${item.text}</span>
-        <span class="wishlist-by">Ditulis oleh: ${item.name}</span>
-      </div>
-    `;
-    diaryList.appendChild(li);
-  }
-});
+}
 
 /* ============================
    FOOD MODAL
-============================ */
+   ============================ */
+
 const foodCards = document.querySelectorAll(".food-card");
 const foodModal = document.getElementById("food-modal");
 const foodTitle = document.getElementById("food-title");
@@ -520,32 +584,36 @@ const foodData = {
     title: "Mie Ayam",
     img: "https://i.imgur.com/E0qJtB2.jpeg",
     desc: "Comfort food paling aman buat segala cuaca.",
-    story: "Ini makanan favorit dia. Dari pertama kali kenal sampai sekarang, pilihan aman yang nggak pernah gagal bikin mood naik."
+    story:
+      "Ini makanan favorit dia. Dari pertama kali kenal sampai sekarang, pilihan aman yang nggak pernah gagal bikin mood naik."
   },
   bakso: {
     title: "Bakso",
     img: "https://i.imgur.com/D3WA3eM.jpeg",
     desc: "Makanan serbaguna, cocok kapan pun.",
-    story: "Kalau lagi bingung makan apa, bakso selalu jadi jawaban. Apalagi pas lagi LDR, ini makanan yang paling sering kepikiran."
+    story:
+      "Kalau lagi bingung makan apa, bakso selalu jadi jawaban. Apalagi pas lagi LDR, ini makanan yang paling sering kepikiran."
   }
 };
 
-foodCards.forEach(card=>{
-  card.onclick = () =>{
-    const key = card.dataset.food;
-    const d = foodData[key];
+if (foodCards && foodModal && foodTitle && foodImage && foodDesc && foodStory && foodClose) {
+  foodCards.forEach((card) => {
+    card.onclick = () => {
+      const key = card.dataset.food;
+      const d = foodData[key];
+      if (!d) return;
 
-    foodTitle.textContent = d.title;
-    foodImage.src = d.img;
-    foodDesc.textContent = d.desc;
-    foodStory.textContent = d.story;
+      foodTitle.textContent = d.title;
+      foodImage.src = d.img;
+      foodDesc.textContent = d.desc;
+      foodStory.textContent = d.story;
 
-    foodModal.style.display = "flex";
+      foodModal.style.display = "flex";
+    };
+  });
+
+  foodClose.onclick = () => (foodModal.style.display = "none");
+  foodModal.onclick = (e) => {
+    if (e.target === foodModal) foodModal.style.display = "none";
   };
-});
-
-foodClose.onclick = ()=> foodModal.style.display = "none";
-foodModal.onclick = (e)=> { 
-  if(e.target === foodModal) foodModal.style.display="none";
-};
 }
